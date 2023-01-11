@@ -1,0 +1,6 @@
+.venv/
+.env
+gfpgan/
+*.jpg
+*.png
+*.pyc
