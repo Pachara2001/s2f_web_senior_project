@@ -13,6 +13,7 @@ db_init(app)
 api_url = 'http://localhost:5000/image'
 oriImgPath="static\oriImg.jpg"
 genImgPath='static\genImg.png'
+tempImgPath='static\\tempImg.png'
 
 load_dotenv()
 
@@ -79,6 +80,28 @@ def uploadImgToCloud():
     else:
         return "something wrong",500
 
+@app.route('/records')
+def showRecords():
+    return render_template('records.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars())
+
+@app.route('/detail')   
+def datail():
+    return render_template('detail.html')
+
+@app.route('/getImage/<type>/<id>' ,methods=['GET'])
+def getImage(type,id):
+    record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
+    if(type=='ori'):
+        s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.originalImg)
+    elif(type=='gen'):
+        s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.genImg)
+    else:
+        s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.realImg)
+    file_data = s3_object['Body'].read()
+    with open(tempImgPath, 'wb') as f:
+            f.write(file_data)   
+
+    return send_file(tempImgPath, mimetype='image/png')
     
 if __name__ == '__main__':
     app.debug = True

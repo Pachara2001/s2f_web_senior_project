@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>record</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/records.css') }}">
+    </head>
+    <body>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>CreateDate</th>
+                <th>UpdateDate</th>
+                <th>Details</th>
+            </tr>
+            {% for i in records %}
+            <tr id="{{i.id}}">
+                <td class="row-data">{{i.id}}</td>
+                <td class="row-data">{{i.createDate}}</td>
+                <td class="row-data">{{i.updateDate}}</td>
+                <td><button type="button" onclick="show()">Details</button></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <script src="{{ url_for('static', filename='js/records.js') }}"></script>
+    </body>
+</html>
