@@ -7,9 +7,22 @@
       </head>
     <body>
         <div  class="container">
-            <div id="display-image" class="imag"></div>
-            <div id="receive-image" class="imag" ></div> 
-            <a href="" id="a"><button id="saveImage">Save image</button></a>
+            <div>
+                <div id="ori-image" class="imag"></div>
+                <a href="" id="a"><button id="saveOriImage">Save image</button></a>
+            </div>
+            <div>
+                <div id="gen-image" class="imag" ></div> 
+                <a href="" id="b"><button id="saveGenImage">Save image</button></a>
+            </div> 
+            <div>
+                <form id="formElem" >
+                    <input type="file" id="real-image-input" accept="image/*" name="image" required>
+                    <div id="display-image" class="imag"></div>
+                    <input type="submit" id="submit-real-img">
+                </form>
+                <a href="" id="c"><button id="saveRealImage">Save image</button></a>
+            </div>
         </div>
         <!-- <script src="{{ url_for('static', filename='js/script.js') }}"></script> -->
     </body> 

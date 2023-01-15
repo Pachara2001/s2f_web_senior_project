@@ -38,7 +38,6 @@ def home():
 def formHandling():
     firstImg = request.files["image"]
     firstImg.save(oriImgPath)
-    
     data={'image': open(oriImgPath, 'rb') }
     try:
         response= requests.post(api_url,files=data)
@@ -50,37 +49,31 @@ def formHandling():
         return str(e),500
 
 # @app.route('/save', methods=['POST'])
-def save(oriImg,genImg):
+def saveDB(oriImg,genImg):
     time = datetime.datetime.now()
-    data = Record(
-        createDate = time,
-        updateDate = time,
-        originalImg =oriImg,
-        genImg = genImg
-    )
+    data = Record(time,oriImg,genImg)
     db.session.add(data)
     db.session.commit()
     return 200
 
-@app.route('/upload_img_to_cloud' , methods=['GET'])
+@app.route('/save_img_to_db' , methods=['GET'])
 def uploadImgToCloud():
     secretTok=secrets.token_hex(16)
     oriName="ori_"+secretTok+".jpg"
     genName="gen_"+secretTok+".png"
-    
     with open(oriImgPath, 'rb') as f:
         s3.upload_fileobj(f, BUCKET_NAME, oriName)
     with open(genImgPath,'rb') as f:
         s3.upload_fileobj(f, BUCKET_NAME, genName)
     # my_json_obj = json.dumps({"originalImg" : oriName,"genImg" : genName})
     # headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    code=save(oriName,genName)
+    code=saveDB(oriName,genName)
     if(code==200):
         return "data save!",200
     else:
         return "something wrong",500
 
-@app.route('/records')
+@app.route('/records')   
 def showRecords():
     return render_template('records.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars())
 
@@ -95,14 +88,29 @@ def getImage(type,id):
         s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.originalImg)
     elif(type=='gen'):
         s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.genImg)
-    else:
+    elif(record.realImg != None):
         s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.realImg)
+    else:
+        return 404
     file_data = s3_object['Body'].read()
     with open(tempImgPath, 'wb') as f:
             f.write(file_data)   
-
     return send_file(tempImgPath, mimetype='image/png')
-    
+
+@app.route('/updateRealImg/<id>' ,methods=['POST'])
+def updateRealImg(id):
+    record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
+    realImg = request.files["image"]
+    realImg.save(tempImgPath)
+    name=record.originalImg.replace("ori","real")
+    with open(tempImgPath, 'rb') as f:
+        s3.upload_fileobj(f, BUCKET_NAME, name)
+    record.realImg = name
+    record.updateDate = datetime.datetime.now()
+    db.session.commit()
+    return 200
+
+
 if __name__ == '__main__':
     app.debug = True
     app.run(port=8000)

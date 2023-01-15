@@ -52,7 +52,7 @@ formElem.onsubmit = async (e) => {
   }
 
   async function saveDB(){
-    let response = await fetch('/upload_img_to_cloud', {
+    let response = await fetch('/save_img_to_db', {
       method: 'GET',
     });
     if(response.status==200){
