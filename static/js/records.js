@@ -93,3 +93,7 @@ function download(url,idhref,name) {
   a.download = name;
 }
 
+function goToHome(){
+  window.location.replace("\\");
+}
+

@@ -30,6 +30,10 @@ s3 = session.client('s3')
 
 file_name = 'test.jpg'
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 @app.route('/')
 def home():
     return render_template('template.html')
@@ -73,11 +77,11 @@ def uploadImgToCloud():
     else:
         return "something wrong",500
 
-@app.route('/records')   
+@app.route('/records')
 def showRecords():
     return render_template('records.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars())
 
-@app.route('/detail')   
+@app.route('/detail')
 def datail():
     return render_template('detail.html')
 

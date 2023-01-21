@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>web</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/design.css') }}">
+  <script type="module" src="{{ url_for('static', filename='js/auth_module.js') }}"></script>
 </head>
 <body>
     <div  class="container">
@@ -16,6 +17,8 @@
           <a href="" id="a"><button id="saveImage">Save image</button></a>
           <button onclick="saveDB()" id="saveDB">saveDB</button>
     </div>
+    <button id="logOut">SignOUT</button>
+    <button onclick="goToRecords()" id="recordsPage">Records</button>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body> 
 </html>

@@ -61,3 +61,7 @@ formElem.onsubmit = async (e) => {
       alert("saveDB went wrong");
     }
   }
+
+  function goToRecords(){
+    window.location.replace("\\records");
+  }

@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <title>record</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/records.css') }}">
+        <script type="module" src="{{ url_for('static', filename='js/auth_module.js') }}"></script>
     </head>
     <body>
         <table>
@@ -23,5 +24,7 @@
             {% endfor %}
         </table>
         <script src="{{ url_for('static', filename='js/records.js') }}"></script>
+        <button id="logOut">SignOUT</button>
+        <button onclick="goToHome()" id="home">HOME</button>
     </body>
 </html>
