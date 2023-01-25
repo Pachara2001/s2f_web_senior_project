@@ -40,19 +40,17 @@ function show() {
         let response = await fetch(`/getImage/ori/${id}`, {method: 'GET'});
           if(response.status==200){
             var imageBlob = await response.blob();
-            rImage = setImage(imageBlob);
             const container = newWindow.document.getElementById('ori-image');
-            container.appendChild(rImage);
-            saveOri_button.onclick = download(rImage.src,"a","OriginalFace.png");
+            setImage(imageBlob,container);
+            saveOri_button.onclick = download(container.firstChild.src,"a","OriginalFace.png");
             saveOri_button.disabled = false;
           }    
         response = await fetch(`/getImage/gen/${id}`, {method: 'GET'});
           if(response.status==200){
            var imageBlob = await response.blob();
-           rImage = setImage(imageBlob);
            const container = newWindow.document.getElementById('gen-image');
-           container.appendChild(rImage);
-           saveGen_button.onclick = download(rImage.src,"b","GenerateFace.png");
+           setImage(imageBlob,container);
+           saveGen_button.onclick = download(container.firstChild.src,"b","GenerateFace.png");
            saveGen_button.disabled = false;
           }
         response = await fetch(`/getImage/real/${id}`, {method: 'GET'});
@@ -60,10 +58,9 @@ function show() {
             image_input.style.display = "none";
             newWindow.document.getElementById("submit-real-img").style.display = "none";
             var imageBlob = await response.blob();
-            rImage = setImage(imageBlob);
             const container = newWindow.document.getElementById('display-image');
-            container.appendChild(rImage);
-            saveReal_button.onclick = download(rImage.src,"c","RealFace.png");
+            setImage(imageBlob,container);
+            saveReal_button.onclick = download(container.firstChild.src,"c","RealFace.png");
             saveReal_button.disabled = false;
           }
           else{
@@ -78,13 +75,17 @@ function show() {
     }, 1000); 
     
 }
-function setImage(imageBlob){
+function setImage(imageBlob,container){
   imageObjectURL = URL.createObjectURL(imageBlob);
   const rImage = newWindow.document.createElement('img');
   rImage.src = imageObjectURL;
   rImage.style.width = "256px";
   rImage.style.height = "256px";
-  return rImage;
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+  container.appendChild(rImage);
+  return null;
 }
 
 function download(url,idhref,name) {
@@ -95,5 +96,10 @@ function download(url,idhref,name) {
 
 function goToHome(){
   window.location.replace("\\");
+}
+function reload(e)
+{
+  var source = e.src;
+  e.src = source;
 }
 

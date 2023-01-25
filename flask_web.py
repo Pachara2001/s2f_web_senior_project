@@ -98,7 +98,7 @@ def getImage(type,id):
         return 404
     file_data = s3_object['Body'].read()
     with open(tempImgPath, 'wb') as f:
-            f.write(file_data)   
+            f.write(file_data)
     return send_file(tempImgPath, mimetype='image/png')
 
 @app.route('/updateRealImg/<id>' ,methods=['POST'])
