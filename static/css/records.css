@@ -3,13 +3,17 @@ table {
     width: 100%;
   }
 
-  .imag{
-    width: 256px;
-    height: 256px;
-    border: 1px solid black;
-    background-position: center;
-    background-size: 100% 100%;
-  }
+table th , table td{
+  text-align: center;
+}
+
+.imag{
+  width: 128px;
+  height: 128px;
+  border: 1px solid black;
+  background-position: center;
+  background-size: 100% 100%;
+}
 
 .imag img {
     width: 100%;
@@ -25,6 +29,6 @@ tr:hover {
     background-color: #D6EEEE;
 }
 
-.invisibleCol {
+/* .invisibleCol {
     visibility:collapse;
-}
+} */
