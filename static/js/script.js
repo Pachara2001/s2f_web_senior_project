@@ -62,6 +62,6 @@ formElem.onsubmit = async (e) => {
     }
   }
 
-  function goToRecords(){
-    window.location.replace("\\records");
-  }
+  // function goToRecords(){
+  //   window.location.replace("\\records");
+  // }

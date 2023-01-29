@@ -9,7 +9,7 @@ function show() {
     var rowId = window.event.target.parentNode.parentNode.id;
     var data = document.getElementById(rowId).querySelectorAll(".row-data"); 
     var id = data[0].innerHTML;
-    newWindow = open('/detail', 'details','width=600,height=300');
+    newWindow = open('/detail', 'details','width=1100,height=400');
     newWindow.focus();
     newWindow.onload = async function() {
         saveOri_button = newWindow.document.querySelector("#saveOriImage");

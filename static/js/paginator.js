@@ -225,7 +225,7 @@
             box.appendChild(page_box);
         }
     }
-
+    var div = document.createElement("div");
     // make rows per page selector
     if (!(typeof config.page_options == "boolean" && !config.page_options)) {
         if (typeof config.page_options == "undefined") {
@@ -251,7 +251,8 @@
             config.rows_per_page = this.value;
             paginator(config);
         }, false);
-        box.appendChild(select);
+        div.appendChild(select);
+        box.appendChild(div);
     }
 
     // status message
@@ -260,7 +261,8 @@
         + ", showing rows " + (((page-1)*rows_per_page)+1)
         + " to " + (trs.length<page*rows_per_page||rows_per_page==0?trs.length:page*rows_per_page)
         + " of " + trs.length;
-    box.appendChild(stat);
+    // stat.classList.add("");
+    div.appendChild(stat);
 
     // hide pagination if disabled
     if (config.disable) {

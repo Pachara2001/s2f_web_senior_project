@@ -9,6 +9,20 @@
         <script src="{{ url_for('static', filename='js/paginator.js') }}"></script>
     </head>
     <body>
+        <nav class="navbar navbar-expand-lg bg-primary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/" style="color: white;">Sketch2Face</a>
+              <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                  <a class="nav-link " href="/" style="color: white;">Generate</a>
+                  <a class="nav-link active" aria-current="page" href="/records" style="color: white;">Records</a>
+                </div>
+                <div class="navbar-nav ms-auto" >
+                  <a class="nav-link" role="button" id="logOut" style="color: white;">Signout</a>
+                </div>		  
+              </div>
+            </div>
+          </nav>
         <div class="container" >
             <div id="table_box_native">
                 <table>
@@ -34,11 +48,11 @@
                     </tbody>
                 </table>
             </div>
-            <div id="index_native" class="box"></div>
+            <div id="index_native" class="box d-flex justify-content-between  "></div>
         </div>
         
-        <button id="logOut">SignOUT</button>
-        <button onclick="goToHome()" id="home">HOME</button>
+        <!-- <button id="logOut">SignOUT</button>
+        <button onclick="goToHome()" id="home">HOME</button> -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
         <script src="{{ url_for('static', filename='js/records.js') }}"></script>
         <script type="text/javascript">
@@ -48,7 +62,8 @@
                 { value: 5,  text: '5'   },
                 { value: 10, text: '10'  },
                 { value: 15, text: '15'  }
-                ]});
+                ],
+    rows_per_page :5});
         </script>
     </body>
 </html>
