@@ -1,6 +1,7 @@
 const image_input = document.querySelector("#image-input");
 const save_button = document.querySelector("#saveImage");
 const saveDB_button = document.querySelector("#saveDB");
+const loading = document.querySelector("#loading");
 save_button.disabled = true;
 saveDB_button.disabled = true;
 var imageObjectURL = null;
@@ -15,6 +16,7 @@ image_input.addEventListener("change", function() {
 });
 
 formElem.onsubmit = async (e) => {
+    loading.style.display = "";
     e.preventDefault();
     let response = await fetch('/formHandling', {
       method: 'POST',
@@ -41,6 +43,7 @@ formElem.onsubmit = async (e) => {
       alert("Something wrong with request.");
       console.log(response.text())
   }
+    loading.style.display = "none";
   };
 
 
