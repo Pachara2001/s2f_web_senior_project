@@ -1,11 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
 from google.cloud.sql.connector import Connector, IPTypes
 import os
-PASSWORD =os.getenv('PASSWORD')
-PUBLIC_IP_ADDRESS =os.getenv('PUBLIC_IP_ADDRESS')
-DBNAME =os.getenv('DBNAME')
-CONNECTION_NAME=os.getenv('CONNECTION_NAME')
-USER=os.getenv('USER')
+from dotenv import load_dotenv
+load_dotenv()
+PASSWORD =os.environ.get('PASSWORD')
+PUBLIC_IP_ADDRESS =os.environ.get('PUBLIC_IP_ADDRESS')
+DBNAME =os.environ.get('DBNAME')
+CONNECTION_NAME=os.environ.get('CONNECTION_NAME')
+USER=os.environ.get('USER')
 db = SQLAlchemy()
 
 def getconn():

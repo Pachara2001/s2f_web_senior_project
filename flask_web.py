@@ -37,7 +37,7 @@ def login():
 
 @app.route('/')
 def home():
-    return render_template('template.html')
+    return render_template('generate.html')
 
 @app.route('/formHandling', methods=['POST' , 'GET'])
 def formHandling():
