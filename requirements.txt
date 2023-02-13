@@ -1,6 +1,6 @@
 boto3
 Flask
 Flask-SQLAlchemy
-PyMySQL
 python-dotenv
 requests
+cloud-sql-python-connector[pg8000]

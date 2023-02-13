@@ -10,7 +10,8 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 db_init(app)
-api_url = 'http://localhost:5000/image'
+api_url = 'http://localhost:8080/image'
+web_url = os.environ.get("url","http://localhost:")+str(os.environ.get("PORT",5000))
 oriImgPath="static\oriImg.jpg"
 genImgPath='static\genImg.png'
 tempImgPath='static\\tempImg.png'
@@ -79,14 +80,15 @@ def uploadImgToCloud():
 
 @app.route('/records')
 def showRecords():
-    return render_template('records.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars())
+    return render_template('records.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars(),webUrl=web_url)
 
-@app.route('/detail')
-def datail():
-    return render_template('detail.html')
+@app.route('/detail/<id>')
+def datail(id):
+    return render_template('detail.html',id=id)
 
 @app.route('/getImage/<type>/<id>' ,methods=['GET'])
 def getImage(type,id):
+    id = int(id)
     record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
     if(type=='ori'):
         s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.originalImg)
@@ -95,7 +97,7 @@ def getImage(type,id):
     elif(record.realImg != None):
         s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.realImg)
     else:
-        return 404
+        return 'notFound',404
     file_data = s3_object['Body'].read()
     with open(tempImgPath, 'wb') as f:
             f.write(file_data)
@@ -103,6 +105,7 @@ def getImage(type,id):
 
 @app.route('/updateRealImg/<id>' ,methods=['POST'])
 def updateRealImg(id):
+    id = int(id)
     record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
     realImg = request.files["image"]
     realImg.save(tempImgPath)
@@ -112,9 +115,8 @@ def updateRealImg(id):
     record.realImg = name
     record.updateDate = datetime.datetime.now()
     db.session.commit()
-    return 200
+    return 'ok',200
 
 
 if __name__ == '__main__':
-    app.debug = True
-    app.run(port=8000)
+    app.run(host="0.0.0.0",debug = True,port=int(os.environ.get("PORT",8080)))
