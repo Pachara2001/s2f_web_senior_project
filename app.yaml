@@ -1,0 +1,23 @@
+runtime: python311
+
+handlers:
+  # This configures Google App Engine to serve the files in the app's static
+  # directory.
+- url: /static
+  static_dir: static
+
+  # This handler routes all requests not caught above to your main app. It is
+  # required when static routes are defined, but can be omitted (along with
+  # the entire handlers section) when there are no static files defined.
+- url: /.*
+  script: auto
+env_variables:
+  GCP_CREDENTIALS: "gcp.json"
+  BUCKET_NAME: "s2f-images"
+  PASSWORD: "123456"
+  PUBLIC_IP_ADDRESS: "35.240.233.5"
+  DBNAME: "data"
+  USER: "postgres"
+  CONNECTION_NAME: "sketch2face-6f527:asia-southeast1:flask-web"
+  API_URL: "https://sketch2face-jx7bz2mffq-as.a.run.app"
+  WEB_URL: "https://sketch2face-6f527.as.r.appspot.com"

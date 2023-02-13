@@ -3,4 +3,5 @@
 gfpgan/
 *.png
 *.pyc
+instance/data.db
 *.json

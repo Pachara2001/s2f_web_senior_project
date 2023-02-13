@@ -1,9 +1,10 @@
 import requests
-from flask import Flask, render_template , request ,send_file
+from flask import Flask, render_template, request, send_file, Response
 from database.db import db , db_init
 from database.models import Record
 import datetime
 import os
+import io
 import secrets
 from dotenv import load_dotenv
 from google.cloud import storage
@@ -19,7 +20,8 @@ API_URL = os.getenv("API_URL")
 
 
 api_url = API_URL + '/image'
-web_url = os.environ.get("url","http://localhost:")+str(os.environ.get("PORT",5000))
+web_url = os.environ.get('WEB_URL')
+# web_url="http://localhost:5000"
 oriImgPath="static\oriImg.jpg"
 genImgPath='static\genImg.png'
 tempImgPath='static\\tempImg.png'
@@ -44,15 +46,17 @@ def home():
 
 @app.route('/formHandling', methods=['POST' , 'GET'])
 def formHandling():
-    firstImg = request.files["image"]
-    firstImg.save(oriImgPath)
-    data={'image': open(oriImgPath, 'rb') }
+    global oriImgFile
+    oriImgFile = request.files["image"].read()
+    # firstImg.save(oriImgPath)
+    data={'image': oriImgFile }
     try:
-        response= requests.post(api_url,files=data)
-        secImg = response.content
-        with open(genImgPath, 'wb') as f:
-            f.write(secImg)    
-        return send_file(genImgPath, mimetype='image/png')
+        global genImgFile
+        genResponse= requests.post(api_url,files=data)
+        genImgFile = genResponse.content
+        # with open(genImgPath, 'wb') as f:
+        #     f.write(secImg)    
+        return Response(genImgFile, mimetype='image/png')
     except requests.exceptions.RequestException as e:
         return str(e),500
 
@@ -73,8 +77,11 @@ def uploadImgToCloud():
     ori_blob = bucket.blob('ori/'+oriName)
     gen_blob = bucket.blob('gen/'+genName)
 
-    ori_blob.upload_from_filename(oriImgPath)
-    gen_blob.upload_from_filename(genImgPath)
+    # ori_blob.upload_from_filename(oriImgPath)
+    
+    ori_blob.upload_from_string(oriImgFile)
+    # gen_blob.upload_from_filename(genImgPath)
+    gen_blob.upload_from_file(io.BytesIO(genImgFile))
     
     code=saveDB(oriName,genName)
     if(code==200):
@@ -102,23 +109,29 @@ def getImage(type,id):
         blob = bucket.get_blob("real/"+record.realImg)
     else:
         return 'notFound',404
-    
+    content_type = None
+    try:
+        content_type = blob.content_type
+    except:
+        pass
     file_data = blob.download_as_string()   
-    with open(tempImgPath, 'wb') as f:
-            f.write(file_data)
+    # with open(tempImgPath, 'wb') as f:
+    #         f.write(file_data)
             
-    return send_file(tempImgPath, mimetype='image/png')
+    # return send_file(file_data, mimetype='image/png')
+    return Response(file_data,  mimetype=content_type)
 
 @app.route('/updateRealImg/<id>' ,methods=['POST'])
 def updateRealImg(id):
     id = int(id)
     record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
     realImg = request.files["image"]
-    realImg.save(tempImgPath)
+    # realImg.save(tempImgPath)
     name=record.originalImg.replace("ori","real")
     
     real_blob = bucket.blob('real/'+name)
-    real_blob.upload_from_filename(tempImgPath)
+    # real_blob.upload_from_filename(tempImgPath)
+    real_blob.upload_from_string(realImg.read())
     
     record.realImg = name
     record.updateDate = datetime.datetime.now()
@@ -127,4 +140,4 @@ def updateRealImg(id):
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug = True,port=int(os.environ.get("PORT",8080)))
+    app.run(debug = True)
