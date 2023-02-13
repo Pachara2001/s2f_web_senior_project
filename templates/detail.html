@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>detail</title>
+        <title>{{id}}</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/detail.css') }}">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
       </head>
@@ -26,9 +26,13 @@
                     <input type="submit" id="submit-real-img" style="margin-top:5px">
                 </form>
                 <a href="" id="c"><button id="saveRealImage" class="button-3" style="margin-top:15px">Download image</button></a>
+                <br/>
+                <button id="saveAll" class="button-3" style="margin-left:140px; margin-top: 5px;" >Download all</button>
             </div>
+            
         </div>
         <!-- <script src="{{ url_for('static', filename='js/script.js') }}"></script> -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='js/detail.js') }}"></script>
     </body> 
 </html>

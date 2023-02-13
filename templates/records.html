@@ -40,9 +40,9 @@
                         {% for i in records %}
                         <tr id="{{i.id}}">
                             <td class="row-data">{{i.id}}</td>
-                            <td class="row-data">{{i.createDate}}</td>
-                            <td class="row-data">{{i.updateDate}}</td>
-                            <td class="row-data"><img src="http://localhost:8000/getImage/gen/{{i.id}}" onerror="reload(this)" class="imag"></td>
+                            <td class="row-data">{{i.createDate.strftime("%d-%m-%Y %H:%M:%S")}}</td>
+                            <td class="row-data">{{i.updateDate.strftime("%d-%m-%Y %H:%M:%S")}}</td>
+                            <td class="row-data"><img src="{{webUrl}}/getImage/gen/{{i.id}}" onerror="reload(this)" class="imag"></td>
                             <td><button class="button-68" type="button" onclick="show()">Details</button></td>
                         </tr>
                         {% endfor %}
