@@ -4,30 +4,33 @@ from database.db import db , db_init
 from database.models import Record
 import datetime
 import os
-import boto3
 import secrets
 from dotenv import load_dotenv
+from google.cloud import storage
+from google.oauth2.service_account import Credentials
 
 app = Flask(__name__)
 db_init(app)
-api_url = 'http://localhost:8080/image'
+load_dotenv()
+
+GCP_CREDENTIALS = os.getenv('GCP_CREDENTIALS')
+BUCKET_NAME = os.getenv('BUCKET_NAME')
+API_URL = os.getenv("API_URL")
+
+
+api_url = API_URL + '/image'
 web_url = os.environ.get("url","http://localhost:")+str(os.environ.get("PORT",5000))
 oriImgPath="static\oriImg.jpg"
 genImgPath='static\genImg.png'
 tempImgPath='static\\tempImg.png'
 
-load_dotenv()
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GCP_CREDENTIALS
+credentials = Credentials.from_service_account_file(GCP_CREDENTIALS)
 
-ACCESS_KEY_ID = os.getenv('ACCESS_KEY')
-SECRET_ACCESS_KEY = os.getenv('SECRET_ACCESS_KEY')
-BUCKET_NAME = os.getenv('BUCKET_NAME')
+storage_client = storage.Client(credentials=credentials)
 
-session = boto3.Session(
-    aws_access_key_id = ACCESS_KEY_ID,
-    aws_secret_access_key = SECRET_ACCESS_KEY
-)
-
-s3 = session.client('s3')
+storage_client = storage.Client()
+bucket = storage_client.get_bucket(BUCKET_NAME)
 
 file_name = 'test.jpg'
 
@@ -66,12 +69,13 @@ def uploadImgToCloud():
     secretTok=secrets.token_hex(16)
     oriName="ori_"+secretTok+".jpg"
     genName="gen_"+secretTok+".png"
-    with open(oriImgPath, 'rb') as f:
-        s3.upload_fileobj(f, BUCKET_NAME, oriName)
-    with open(genImgPath,'rb') as f:
-        s3.upload_fileobj(f, BUCKET_NAME, genName)
-    # my_json_obj = json.dumps({"originalImg" : oriName,"genImg" : genName})
-    # headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+    
+    ori_blob = bucket.blob('ori/'+oriName)
+    gen_blob = bucket.blob('gen/'+genName)
+
+    ori_blob.upload_from_filename(oriImgPath)
+    gen_blob.upload_from_filename(genImgPath)
+    
     code=saveDB(oriName,genName)
     if(code==200):
         return "data save!",200
@@ -91,16 +95,18 @@ def getImage(type,id):
     id = int(id)
     record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
     if(type=='ori'):
-        s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.originalImg)
+        blob = bucket.get_blob("ori/"+record.originalImg)
     elif(type=='gen'):
-        s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.genImg)
+        blob = bucket.get_blob("gen/"+record.genImg)
     elif(record.realImg != None):
-        s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=record.realImg)
+        blob = bucket.get_blob("real/"+record.realImg)
     else:
         return 'notFound',404
-    file_data = s3_object['Body'].read()
+    
+    file_data = blob.download_as_string()   
     with open(tempImgPath, 'wb') as f:
             f.write(file_data)
+            
     return send_file(tempImgPath, mimetype='image/png')
 
 @app.route('/updateRealImg/<id>' ,methods=['POST'])
@@ -110,8 +116,10 @@ def updateRealImg(id):
     realImg = request.files["image"]
     realImg.save(tempImgPath)
     name=record.originalImg.replace("ori","real")
-    with open(tempImgPath, 'rb') as f:
-        s3.upload_fileobj(f, BUCKET_NAME, name)
+    
+    real_blob = bucket.blob('real/'+name)
+    real_blob.upload_from_filename(tempImgPath)
+    
     record.realImg = name
     record.updateDate = datetime.datetime.now()
     db.session.commit()
