@@ -5,10 +5,7 @@ var newWindow;
 
 // getPagination('#table-id');
 
-function show() {
-    var rowId = window.event.target.parentNode.parentNode.id;
-    var data = document.getElementById(rowId).querySelectorAll(".row-data"); 
-    var id = data[0].innerHTML;
+function show(id) {
     newWindow = open('/detail/'+id, 'details','width=1100,height=400');
     newWindow.focus();
     // var timer = setInterval(function() {   

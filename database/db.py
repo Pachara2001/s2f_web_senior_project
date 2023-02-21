@@ -22,7 +22,6 @@ def getconn():
         )
         return conn
 
-# Function that initializes the db and creates the tables
 def db_init(app):
     # app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:mypassword@localhost/data"
     # app.config["SQLALCHEMY_DATABASE_URI"] =n "sqlite:///data.db"
