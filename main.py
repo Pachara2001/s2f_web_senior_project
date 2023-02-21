@@ -89,9 +89,9 @@ def uploadImgToCloud():
     else:
         return "something wrong",500
 
-@app.route('/records')
+@app.route('/database')
 def showRecords():
-    return render_template('records.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars(),webUrl=web_url)
+    return render_template('database.html', records=db.session.execute(db.select(Record).order_by(Record.id)).scalars(),webUrl=web_url)
 
 @app.route('/detail/<id>')
 def datail(id):
@@ -105,7 +105,7 @@ def getImage(type,id):
         blob = bucket.get_blob("ori/"+record.originalImg)
     elif(type=='gen'):
         blob = bucket.get_blob("gen/"+record.genImg)
-    elif(record.realImg != None):
+    elif(record.realImg != None and type=='real'):
         blob = bucket.get_blob("real/"+record.realImg)
     else:
         return 'notFound',404
