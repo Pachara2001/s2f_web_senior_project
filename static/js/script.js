@@ -38,6 +38,13 @@ formElem.onsubmit = async (e) => {
      save_button.disabled = false;
      saveDB_button.disabled = false;
      save_button.onclick = download(imageObjectURL);
+     
+     let response = await fetch(`/get_bw_img`, {method: 'GET'});
+        if(response.status==200){
+        imageBlob = await response.blob();
+        const container = document.getElementById('bw-image');
+        setImage(imageBlob,container);
+        }    
     }
     else{
       alert("Something wrong with request.");
@@ -64,6 +71,19 @@ formElem.onsubmit = async (e) => {
       alert("saveDB went wrong");
     }
   }
+
+  function setImage(imageBlob,container){
+    imageObjectURL = URL.createObjectURL(imageBlob);
+    const rImage = document.createElement('img');
+    rImage.src = imageObjectURL;
+    rImage.style.width = "256px";
+    rImage.style.height = "256px";
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    container.appendChild(rImage);
+    return null;
+    }
 
   // function goToRecords(){
   //   window.location.replace("\\records");

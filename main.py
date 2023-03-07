@@ -22,9 +22,9 @@ API_URL = os.getenv("API_URL")
 api_url = API_URL + '/image'
 web_url = os.environ.get('WEB_URL')
 # web_url="http://localhost:5000"
-oriImgPath="static\oriImg.jpg"
-genImgPath='static\genImg.png'
-tempImgPath='static\\tempImg.png'
+# oriImgPath="static\oriImg.jpg"
+# genImgPath='static\genImg.png'
+# tempImgPath='static\\tempImg.png'
 
 # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GCP_CREDENTIALS
 credentials = Credentials.from_service_account_file(GCP_CREDENTIALS)
@@ -50,10 +50,12 @@ def formHandling():
     oriImgFile = request.files["image"].read()
     # firstImg.save(oriImgPath)
     data={'image': oriImgFile }
+    global genImgFile
+    global genBwImgFile
     try:
-        global genImgFile
         genResponse= requests.post(api_url,files=data)
-        genImgFile = genResponse.content
+        genImgFile = genResponse.content[0]
+        genBwImgFile = genResponse.content[1]
         # with open(genImgPath, 'wb') as f:
         #     f.write(secImg)    
         return Response(genImgFile, mimetype='image/png')
@@ -67,6 +69,10 @@ def saveDB(oriImg,genImg):
     db.session.add(data)
     db.session.commit()
     return 200
+
+@app.route('/get_bw_img' , methods=['GET'])
+def getBlackWhiteImg():
+    return Response(genBwImgFile, mimetype='image/png')
 
 @app.route('/save_img_to_db' , methods=['GET'])
 def uploadImgToCloud():
