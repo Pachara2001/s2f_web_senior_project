@@ -4,6 +4,8 @@
     border: 1px solid black;
     background-position: center;
     background-size: 100% 100%;
+    background-color: white; 
+    margin-bottom:10px
   }
 
 .imag img {
@@ -48,6 +50,7 @@
   appearance: none;
   background-color: #2ea44f;
   border: 1px solid rgba(27, 31, 35, .15);
+  margin-top:15px;
   border-radius: 6px;
   box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
   box-sizing: border-box;

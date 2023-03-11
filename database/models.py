@@ -6,12 +6,12 @@ class Record(db.Model):
     updateDate = db.Column(db.DateTime,nullable=False)
     originalImg = db.Column(db.String(),nullable=False)
     genImg = db.Column(db.String(),nullable=False)
+    genBwImg = db.Column(db.String(),nullable=False)
     realImg = db.Column(db.String(),nullable=True)
-    def __init__(self, time, originalImg,genImg):
+    def __init__(self, time, originalImg,genImg,genBwImg):
         self.createDate = time
         self.updateDate = time
         self.originalImg = originalImg
         self.genImg = genImg
+        self.genBwImg = genBwImg
     
-
-

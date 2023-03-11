@@ -6,3 +6,4 @@ requests
 cloud-sql-python-connector[pg8000]
 google-cloud-storage
 google-auth
+Pillow

@@ -21,3 +21,10 @@ env_variables:
   CONNECTION_NAME: "sketch2face-6f527:asia-southeast1:flask-web"
   API_URL: "https://sketch2face-jx7bz2mffq-as.a.run.app"
   WEB_URL: "https://sketch2face-6f527.as.r.appspot.com"
+  
+automatic_scaling:
+  min_idle_instances: automatic
+  max_idle_instances: 1
+  min_pending_latency: automatic
+  max_pending_latency: 0.030s
+  max_instances: 1

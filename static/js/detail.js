@@ -1,10 +1,13 @@
 const saveOri_button = document.querySelector("#saveOriImage");
 const saveGen_button = document.querySelector("#saveGenImage");
+const saveGenBw_button = document.querySelector("#saveGenBwImage");
 const saveReal_button = document.querySelector("#saveRealImage");
+
 let image_input = document.querySelector("#real-image-input");
 const id= document.title;
 document.addEventListener("DOMContentLoaded", async function() {
     saveGen_button.disabled = true;
+    saveGenBw_button.disabled = true;
     saveOri_button.disabled = true;
     saveReal_button.disabled = true;
     
@@ -16,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
         if (response=200){
         alert("Save successfull.");
+        this.location.reload();
         }
     }
 
@@ -34,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         var imageBlob = await response.blob();
         const container = document.getElementById('ori-image');
         setImage(imageBlob,container);
-        saveOri_button.onclick = download(container.firstChild.src,"a","SketchImage"+id+".png");
+        saveOri_button.onclick = download(container.firstChild.src,"a","SketchImage_"+id+".png");
         saveOri_button.disabled = false;
         }    
     response = await fetch(`/getImage/gen/${id}`, {method: 'GET'});
@@ -44,6 +48,14 @@ document.addEventListener("DOMContentLoaded", async function() {
         setImage(imageBlob,container);
         saveGen_button.onclick = download(container.firstChild.src,"b","GenerateImage_"+id+".png");
         saveGen_button.disabled = false;
+        }
+    response = await fetch(`/getImage/genBw/${id}`, {method: 'GET'});
+        if(response.status==200){
+        var imageBlob = await response.blob();
+        const container = document.getElementById('gen-bw-image');
+        setImage(imageBlob,container);
+        saveGenBw_button.onclick = download(container.firstChild.src,"d","GenerateBlackAndWhiteImage_"+id+".png");
+        saveGenBw_button.disabled = false;
         }
     response = await fetch(`/getImage/real/${id}`, {method: 'GET'});
         if(response.status==200){
@@ -62,14 +74,16 @@ document.addEventListener("DOMContentLoaded", async function() {
     saveAll.onclick = function(){
         console.log(typeof saveGen_button.onclick);
         if(typeof saveGen_button.onclick == "object") {
-        
-        saveGen_button.click();
+            saveGen_button.click();
         }
+        if(typeof saveGenBw_button == "object"){
+            saveGenBw_button.click();
+            }
         if(typeof saveOri_button == "object"){
-        saveOri_button.click();
+            saveOri_button.click();
         }
         if(typeof saveReal_button == "object"){
-        saveReal_button.click();
+            saveReal_button.click();
         }
     }
   });
