@@ -33,7 +33,20 @@ document.addEventListener("DOMContentLoaded", async function() {
         submitReal_button.disabled = false;
     });
 
-    let response = await fetch(`/getImage/ori/${id}`, {method: 'GET'});
+    let response = await fetch(`/getImage/real/${id}`, {method: 'GET'});
+        if(response.status==200){
+        image_input.style.display = "none";
+        document.getElementById("submit-real-img").style.display = "none";
+        var imageBlob = await response.blob();
+        const container = document.getElementById('display-image');
+        setImage(imageBlob,container);
+        saveReal_button.onclick = download(container.firstChild.src,"c","RealImage_"+id+".png");
+        saveReal_button.disabled = false;
+        }
+        else{
+        saveReal_button.style.display = "none";
+        }  
+     response = await fetch(`/getImage/ori/${id}`, {method: 'GET'});
         if(response.status==200){
         var imageBlob = await response.blob();
         const container = document.getElementById('ori-image');
@@ -57,19 +70,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         saveGenBw_button.onclick = download(container.firstChild.src,"d","GenerateBlackAndWhiteImage_"+id+".png");
         saveGenBw_button.disabled = false;
         }
-    response = await fetch(`/getImage/real/${id}`, {method: 'GET'});
-        if(response.status==200){
-        image_input.style.display = "none";
-        document.getElementById("submit-real-img").style.display = "none";
-        var imageBlob = await response.blob();
-        const container = document.getElementById('display-image');
-        setImage(imageBlob,container);
-        saveReal_button.onclick = download(container.firstChild.src,"c","RealImage_"+id+".png");
-        saveReal_button.disabled = false;
-        }
-        else{
-        saveReal_button.style.display = "none";
-        }  
     const saveAll=document.getElementById("saveAll");
     saveAll.onclick = function(){
         console.log(typeof saveGen_button.onclick);

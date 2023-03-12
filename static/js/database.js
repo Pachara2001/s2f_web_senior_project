@@ -6,7 +6,7 @@ var newWindow;
 // getPagination('#table-id');
 
 function show(id) {
-    newWindow = open('/detail/'+id, 'details','width=1100,height=400');
+    newWindow = open('/detail/'+id, 'details','width=1150,height=550');
     newWindow.focus();
     // var timer = setInterval(function() {   
     //   if(newWindow.closed) {  
