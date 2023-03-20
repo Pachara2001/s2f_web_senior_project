@@ -21,7 +21,6 @@ function initApp() {
       if (user) {
         // User is signed in.
         var email = user.email;
-        console.log(email);
       } else {
         // User is signed out.
         window.location.replace("\\login");

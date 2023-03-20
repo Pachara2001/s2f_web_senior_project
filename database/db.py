@@ -23,14 +23,11 @@ def getconn():
         return conn
 
 def db_init(app):
-    # app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:mypassword@localhost/data"
-    # app.config["SQLALCHEMY_DATABASE_URI"] =n "sqlite:///data.db"
     app.config["SQLALCHEMY_DATABASE_URI"]="postgresql+pg8000://"
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "creator": getconn
     }
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
     db.init_app(app)
-    # Creates the logs tables if the db doesnt already exist
     with app.app_context():
         db.create_all()
