@@ -21,6 +21,7 @@ env_variables:
   CONNECTION_NAME: "sketch2face-6f527:asia-southeast1:flask-web"
   API_URL: "https://sketch2face-jx7bz2mffq-as.a.run.app"
   WEB_URL: "https://sketch2face-6f527.as.r.appspot.com"
+  TZ: "Asia/Bangkok"
   
 automatic_scaling:
   min_idle_instances: automatic
