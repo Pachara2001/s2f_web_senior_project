@@ -17,55 +17,57 @@ image_input.addEventListener("change", function() {
   reader.readAsDataURL(this.files[0]);
 });
 
+AbortSignal.timeout ??= function timeout(ms) {
+  const ctrl = new AbortController()
+  setTimeout(() => ctrl.close(), ms)
+  return ctrl.signal
+}
+
 formElem.onsubmit = async (e) => {
     loading.style.display = "";
     e.preventDefault();
-    let timeLimit = 180000; //3 mins
-    let failureValue = null
-    let response = await fulfillWithTimeLimit(timeLimit, fetch('/formHandling', {
+    try{
+      let response =  await fetch('/formHandling', {
       method: 'POST',
-      body: new FormData(formElem)
-    }), failureValue);
-    // let response = await fetch('/formHandling', {
-    //   method: 'POST',
-    //   body: new FormData(formElem)
-    // });
-    if(response == null){
-      alert("Timeout exceeded.")
-      loading.style.display = "none";
-      return;
-    }
-    if(response.status==200){
-      imageBlob = await response.blob();
-      container = document.getElementById('receive-image');
-     setImage(imageBlob,container);
-     save_button.disabled = false;
-     saveDB_button.disabled = false;
-     save_button.onclick = download("a",URL.createObjectURL(imageBlob),"face.png");
-    }
-    else{
-      alert("Something wrong with request.");
-      console.log(response.text())
-      loading.style.display = "none";
-      return;
-    }
-    response = await fetch('/getBwImg', {
-      method: 'GET',
-    });
-    if(response.status==200){
-      imageBlob = await response.blob();
-      container = document.getElementById('bw-image');
-      setImage(imageBlob,container);
-      save_bw_button.disabled = false;
-      save_bw_button.onclick = download("b",URL.createObjectURL(imageBlob),"BWface.png");
+      body: new FormData(formElem),
+      signal: AbortSignal.timeout(180000),}); // 3 minutes
+      if(response.status==200){
+        imageBlob = await response.blob();
+        container = document.getElementById('receive-image');
+        setImage(imageBlob,container);
+        save_button.disabled = false;
+        saveDB_button.disabled = false;
+        save_button.onclick = download("a",URL.createObjectURL(imageBlob),"face.png");
+      }
+      else{
+        throw response.text();
+      }
+      response = await fetch('/getBwImg', {
+        method: 'GET',
+      });
+      if(response.status==200){
+        imageBlob = await response.blob();
+        container = document.getElementById('bw-image');
+        setImage(imageBlob,container);
+        save_bw_button.disabled = false;
+        save_bw_button.onclick = download("b",URL.createObjectURL(imageBlob),"BWface.png");
+      }
+      else{
+        throw response.text();
+      }
+  }
+  catch (err){
+    if (err.name == 'AbortError'){
+      alert("Timeout exceeded.");
     }
     else{
       alert("Something wrong with request.");
-      console.log(response.text())
-      loading.style.display = "none";
-      return;
+      console.log(err);
     }
+  }
+  finally{
     loading.style.display = "none";
+  }
   };
 
 
@@ -99,21 +101,3 @@ formElem.onsubmit = async (e) => {
     container.appendChild(rImage);
     return null;
     }
-
-    async function fulfillWithTimeLimit(timeLimit, task, failureValue){
-      let timeout;
-      const timeoutPromise = new Promise((resolve, reject) => {
-          timeout = setTimeout(() => {
-              resolve(failureValue);
-          }, timeLimit);
-      });
-      const response = await Promise.race([task, timeoutPromise]);
-      if(timeout){ 
-          clearTimeout(timeout);
-      }
-      return response;
-  }
-
-  // function goToRecords(){
-  //   window.location.replace("\\records");
-  // }

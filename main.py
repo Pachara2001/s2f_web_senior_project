@@ -6,7 +6,6 @@ from PIL import Image
 from io import BytesIO
 import datetime
 import os
-import io
 import secrets
 from dotenv import load_dotenv
 from google.cloud import storage
@@ -22,21 +21,13 @@ API_URL = os.getenv("API_URL")
 oriImgFile= ""
 genImgFile= ""
 bwImgFile= ""
-
-
 api_url = API_URL + '/image'
 web_url = os.environ.get('WEB_URL')
 # web_url="http://localhost:5000"
-
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = GCP_CREDENTIALS
 credentials = Credentials.from_service_account_file(GCP_CREDENTIALS)
-
 storage_client = storage.Client(credentials=credentials)
-
 storage_client = storage.Client()
 bucket = storage_client.get_bucket(BUCKET_NAME)
-
-file_name = 'test.jpg'
 
 @app.route('/login')
 def login():
@@ -51,14 +42,10 @@ def formHandling():
     global oriImgFile
     global genImgFile
     oriImgFile = request.files["image"].read()
-    # firstImg.save(oriImgPath)
     data={'image': oriImgFile }
-  
     try:
         genResponse= requests.post(api_url,files=data)
-        genImgFile = genResponse.content
-        # with open(genImgPath, 'wb') as f:
-        #     f.write(secImg)    
+        genImgFile = genResponse.content 
         return Response(genImgFile, mimetype='image/png')
     except requests.exceptions.RequestException as e:
         return str(e),500
@@ -71,49 +58,39 @@ def saveDB(oriImg,genImg,genBwImg):
     return 200
 
 @app.route('/getBwImg', methods=['GET'])
-def getBwimg():
+def getBwImg():
     global bwImgFile
-    # if genImgFile=='':
-    #     genImgFile = memcache.get('genImgFile')
-
     tempFile = Image.open(BytesIO(genImgFile))
     bwImgFile = tempFile.convert("L")
-    # memcache.add(key='bwImgFile',Value=bwImgFile.decode("ISO-8859-1"),time=300)
     buffer = BytesIO()
     bwImgFile.save(buffer, format='PNG')
     buffer.seek(0)
     return Response(buffer.read(), mimetype='image/png')
 
 @app.route('/save_img_to_db' , methods=['GET'])
+def saveImgToDb():
+    oriName,genName,genBwName = uploadImgToCloud()
+    code = saveDB(oriName,genName,genBwName)
+    if(code==200):
+        return "data save!",200
+    else:
+        return "something wrong",500
+
 def uploadImgToCloud():
     secretTok=secrets.token_hex(16)
     oriName="ori_"+secretTok+".jpg"
     genName="gen_"+secretTok+".png"
     genBwName="genBw_"+secretTok+".png"
-    
     ori_blob = bucket.blob('ori/'+oriName)
     gen_blob = bucket.blob('gen/'+genName)
     genBw_blob=bucket.blob('genBw/'+genBwName)
-
-    # ori_blob.upload_from_filename(oriImgPath)
-    # if oriImgFile=='':
-    #     oriImgFile = memcache.get('genImgFile')
-    # if genImgFile=='':
-    #     genImgFile = memcache.get('genImgFile')
-    # if bwImgFile=='':
-    #     bwImgFile = memcache.get('bwImgFile')
     buffer = BytesIO()
     bwImgFile.save(buffer, format='PNG')
     buffer.seek(0)
     ori_blob.upload_from_string(oriImgFile)
     gen_blob.upload_from_file(BytesIO(genImgFile))
     genBw_blob.upload_from_file(BytesIO(buffer.read()))
-    
-    code=saveDB(oriName,genName,genBwName)
-    if(code==200):
-        return "data save!",200
-    else:
-        return "something wrong",500
+    return oriName,genName,genBwName;
 
 @app.route('/database')
 def showRecords():
@@ -144,7 +121,6 @@ def getImage(type,id):
         pass
     file_data = blob.download_as_string()  
             
-    # return send_file(file_data, mimetype='image/png')
     return Response(file_data,  mimetype=content_type)
 
 @app.route('/updateRealImg/<id>' ,methods=['POST'])
@@ -153,10 +129,8 @@ def updateRealImg(id):
     record = db.session.execute(db.select(Record).filter_by(id=id)).scalar_one()
     realImg = request.files["image"]
     name=record.originalImg.replace("ori","real")
-    
     real_blob = bucket.blob('real/'+name)
     real_blob.upload_from_string(realImg.read())
-    
     record.realImg = name
     record.updateDate = datetime.datetime.now()
     db.session.commit()
